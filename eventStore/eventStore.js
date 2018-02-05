@@ -1,6 +1,7 @@
 const mysql = require('mysql');
 const Joi = require('joi');
 const validateEvent = require('./validateEvent');
+const rowToEvent = require('./rowToEvent');
 
 const pool = mysql.createPool({
     connectionLimit: 5,
@@ -8,16 +9,6 @@ const pool = mysql.createPool({
     user     : 'root',
     database : 'damoori'
 });
-
-const rowToEvent = (row) => {
-    return {
-        sequenceId: row['sequence_id'],
-        type: row['type'],
-        version: row['version'],
-        body: JSON.parse(row['body']),
-        createdUtc: row['created_utc'].toISOString()
-    };
-};
 
 const getEvent = (sequenceId) => {
     const query = `select * from events where sequence_id = ${sequenceId}`;
