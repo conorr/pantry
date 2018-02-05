@@ -28,6 +28,8 @@ const getEvent = (sequenceId) => {
 };
 
 const getEvents = (sequenceIdStart = 0, top = 100) => {
+    if (sequenceIdStart < 0) throw new Error('sequenceIdStart must be zero or greater');
+    if (top < 0) throw new Error('top must be zero or greater');
     const query = `select * from events where sequence_id >= ${sequenceIdStart} limit ${top}`;
     return new Promise((resolve, reject) => {
         pool.getConnection((error, connection) => {
