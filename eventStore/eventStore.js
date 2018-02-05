@@ -47,8 +47,8 @@ const getEvents = (sequenceIdStart = 0, top = 100) => {
 
 const saveEvent = (event) => {
     validateEvent(event);
-    const bodySerialized = JSON.stringify(event.body);
-    const query = `insert into events(type, version, body, created_utc) values ('${event.type}', ${event.version}, '${bodySerialized}', UTC_TIMESTAMP())`;
+    const serializedBody = JSON.stringify(event.body);
+    const query = `insert into events(type, version, namespace, body, created_utc) values ('${event.type}', '${event.version}', ${event.namespace}, '${serializedBody}', UTC_TIMESTAMP())`;
     pool.getConnection((error, connection) => {
         if (error) throw error;
         connection.query(query, (err) => {

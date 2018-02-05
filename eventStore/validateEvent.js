@@ -4,6 +4,7 @@ const schema = Joi.object().keys({
     type: Joi.string().token().min(1).max(255)
         .required(),
     version: Joi.number().integer().greater(0),
+    namespace: Joi.string().max(255),
     body: Joi.object(),
 });
 
