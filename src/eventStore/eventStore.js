@@ -1,10 +1,19 @@
+const mysql = require('mysql');
 const validateEvent = require('./validateEvent');
 const rowToEvent = require('./rowToEvent');
 
 class EventStore {
-    constructor(pool) {
-        if (!pool) throw new Error('MySQL connection pool required in constructor call');
-        this.pool = pool;
+    constructor(mysqlHost, mysqlUser, mysqlDatabase) {
+        if (!mysqlHost) throw new Error('host is required and not specified');
+        if (!mysqlUser) throw new Error('user is required and not specified');
+        if (!mysqlDatabase) throw new Error('database is required and not specified');
+        this.pool = mysql.createPool({
+            connectionLimit: 10,
+            host: mysqlHost,
+            user: mysqlUser,
+            database: mysqlDatabase,
+            timezone: 'Z',
+        });
     }
 
     getEvent(sequenceId) {

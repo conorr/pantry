@@ -8,27 +8,35 @@ chai.use(chaiAsPromised);
 
 /* eslint-disable no-undef */
 
-const pool = mysql.createPool({
-    connectionLimit: 5,
-    host: 'localhost',
-    user: 'root',
-    database: 'damoori_integration_test',
-    timezone: 'Z',
-});
+const mysqlHost = 'localhost';
+const mysqlUser = 'root';
+const mysqlDatabase = 'damoori_integration_test';
+
+const truncateEventsTable = () => {
+    const connection = mysql.createConnection({
+        host: mysqlHost,
+        user: mysqlUser,
+        database: mysqlDatabase,
+    });
+    connection.connect();
+    connection.query('truncate table events');
+};
 
 describe('Event store', () => {
     let eventStore;
 
     before(() => {
-        eventStore = new EventStore(pool);
+        eventStore = new EventStore(mysqlHost, mysqlUser, mysqlDatabase);
     });
 
-    beforeEach((done) => {
-        pool.getConnection((error, connection) => {
-            if (error) throw error;
-            connection.query('truncate table events;');
-            done();
-        });
+    beforeEach(() => {
+        truncateEventsTable();
+    });
+
+    describe('construction', () => {
+        it('throws an error if mysqlHost is null or undefined');
+        it('throws an error if mysqlUser is null or undefined');
+        it('throws an error if mysqlDatabase is null or undefined');
     });
 
     it('it saves and retrieves one event', (done) => {
@@ -51,9 +59,9 @@ describe('Event store', () => {
 
                 const currentDate = new Date();
                 const createdDate = new Date(event.createdUtc);
-                const delta = (Math.floor(currentDate.getTime() / 1000) -
+                const deltaSeconds = (Math.floor(currentDate.getTime() / 1000) -
                     Math.floor(createdDate.getTime() / 1000));
-                delta.should.be.below(2);
+                deltaSeconds.should.be.below(2);
             })
             .then(done)
             .catch(done);
