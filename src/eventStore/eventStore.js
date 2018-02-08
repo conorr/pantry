@@ -46,7 +46,6 @@ class EventStore {
                     if (err) reject(err);
                     let events = [];
                     if (results.length > 0) {
-                        console.log(results[0].created_utc);
                         events = results.map(rowToEvent);
                     }
                     resolve(events);
