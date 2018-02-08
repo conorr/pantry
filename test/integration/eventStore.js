@@ -107,4 +107,28 @@ describe('Event store', () => {
                 .catch(done);
         });
     });
+
+    describe('saveEvents', () => {
+        before((done) => {
+            eventStore.saveEvent({
+                type: 'AUGMENT_ORANGE',
+                version: 1,
+                namespace: '',
+                body: {},
+            }).then(done);
+        });
+
+        it('throws an error if not passed an array', () => {
+            const badCall = () => eventStore.saveEvents('oops');
+            badCall.should.throw();
+        });
+
+        it('returns a resolved promise if passed an empty array', (done) => {
+            eventStore.saveEvents([]).then(done);
+        });
+
+        it('saves one event correctly');
+
+        it('saves multiple events correctly');
+    });
 });
