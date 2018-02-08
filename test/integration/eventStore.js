@@ -38,12 +38,12 @@ describe('Event store', () => {
         it('throws an error if mysqlDatabase is null or undefined');
     });
 
-    describe('general persistence and retrieval', () => {
+    describe('end to end', () => {
         beforeEach((done) => {
             truncateEventsTable().then(done);
         });
 
-        it('it saves and retrieves one event', (done) => {
+        it('saves and retrieves one event', (done) => {
             eventStore.saveEvent({
                 type: 'HELLO_WORLD',
                 version: 1,
@@ -126,9 +126,5 @@ describe('Event store', () => {
         it('returns a resolved promise if passed an empty array', (done) => {
             eventStore.saveEvents([]).then(done);
         });
-
-        it('saves one event correctly');
-
-        it('saves multiple events correctly');
     });
 });
