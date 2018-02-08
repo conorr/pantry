@@ -33,7 +33,6 @@ describe('Event store', () => {
     });
 
     describe('construction', () => {
-
         it('throws an error if mysqlHost is null, undefined, or an empty string', () => {
             const badCall1 = () => new EventStore(null, mysqlUser, mysqlDatabase);
             const badCall2 = () => new EventStore(undefined, mysqlUser, mysqlDatabase);
