@@ -108,6 +108,54 @@ describe('Event store', () => {
         });
     });
 
+    describe('getEvent', (done) => {
+        it('gets correct event by sequenceId', () => {
+            eventStore.saveEvents([
+                { type: 'ADD_BANANA', version: 1, namespace: '', body: {} },
+                { type: 'REMOVE_BANANA', version: 1, namespace: '', body: {} },
+                { type: 'ADD_ORANGE', version: 1, namespace: '', body: {} },
+                { type: 'AUGMENT_ORANGE', version: 1, namespace: '', body: {} },
+                { type: 'REMOVE_ORANGE', version: 1, namespace: '', body: {} },
+            ])
+                .then(() => eventStore.getEvent(3))
+                .then((event) => {
+                    event.type.should.equal('ADD_ORANGE');
+                })
+                .then(done)
+                .catch(done);
+        });
+    });
+
+    describe('getEvents', (done) => {
+        it('gets a slice of events correctly', () => {
+            eventStore.saveEvents([
+                { type: 'ADD_BANANA', version: 1, namespace: '', body: {} },
+                { type: 'REMOVE_BANANA', version: 1, namespace: '', body: {} },
+                { type: 'ADD_ORANGE', version: 1, namespace: '', body: {} },
+                { type: 'AUGMENT_ORANGE', version: 1, namespace: '', body: {} },
+                { type: 'REMOVE_ORANGE', version: 1, namespace: '', body: {} },
+            ])
+                .then(() => eventStore.getEvents(3, 3))
+                .then((events) => {
+                    events.should.have.lengthOf(3);
+
+                    let event = events.shift();
+                    event.sequenceId.should.equal(3);
+                    event.type.should.equal('ADD_ORANGE');
+
+                    event = events.shift();
+                    event.sequenceId.should.equal(4);
+                    event.type.should.equal('AUGMENT_ORANGE');
+
+                    event = events.shift();
+                    event.sequenceId.should.equal(5);
+                    event.type.should.equal('REMOVE_ORANGE');
+                })
+                .then(done)
+                .catch(done);
+        });
+    });
+
     describe('saveEvents', () => {
         before((done) => {
             eventStore.saveEvent({
