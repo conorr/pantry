@@ -33,9 +33,33 @@ describe('Event store', () => {
     });
 
     describe('construction', () => {
-        it('throws an error if mysqlHost is null or undefined');
-        it('throws an error if mysqlUser is null or undefined');
-        it('throws an error if mysqlDatabase is null or undefined');
+
+        it('throws an error if mysqlHost is null, undefined, or an empty string', () => {
+            const badCall1 = () => new EventStore(null, mysqlUser, mysqlDatabase);
+            const badCall2 = () => new EventStore(undefined, mysqlUser, mysqlDatabase);
+            const badCall3 = () => new EventStore('', mysqlUser, mysqlDatabase);
+            badCall1.should.throw();
+            badCall2.should.throw();
+            badCall3.should.throw();
+        });
+
+        it('throws an error if mysqlUser is null, undefined, or an empty string', () => {
+            const badCall1 = () => new EventStore(mysqlHost, null, mysqlDatabase);
+            const badCall2 = () => new EventStore(mysqlHost, undefined, mysqlDatabase);
+            const badCall3 = () => new EventStore(mysqlHost, '', mysqlDatabase);
+            badCall1.should.throw();
+            badCall2.should.throw();
+            badCall3.should.throw();
+        });
+
+        it('throws an error if mysqlDatabase is null, undefined, or an empty string', () => {
+            const badCall1 = () => new EventStore(mysqlHost, mysqlUser, null);
+            const badCall2 = () => new EventStore(mysqlHost, mysqlUser, undefined);
+            const badCall3 = () => new EventStore(mysqlHost, mysqlUser, '');
+            badCall1.should.throw();
+            badCall2.should.throw();
+            badCall3.should.throw();
+        });
     });
 
     describe('end to end', () => {
