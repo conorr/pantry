@@ -37,7 +37,7 @@ class EventStore {
     getEvents(sequenceIdStart = 0, top = 100) {
         if (sequenceIdStart < 0) throw new Error('sequenceIdStart must be zero or greater');
         if (top < 0) throw new Error('top must be zero or greater');
-        const query = `select * from events where sequence_id >= ${sequenceIdStart} limit ${top}`;
+        const query = `select * from events where sequence_id >= ${sequenceIdStart} order by sequence_id asc limit ${top}`;
         return new Promise((resolve, reject) => {
             this.pool.getConnection((error, connection) => {
                 if (error) reject(error);
