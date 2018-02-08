@@ -60,7 +60,7 @@ class EventStore {
         const query = `insert into events(type, version, namespace, body, created_utc) values ('${event.type}', ${event.version}, '${event.namespace}', '${bodySerialized}', UTC_TIMESTAMP())`;
         return new Promise((resolve, reject) => {
             this.pool.getConnection((error, connection) => {
-                if (error) throw error;
+                if (error) reject(error);
                 connection.query(query, (err) => {
                     connection.release();
                     if (err) reject(err);
