@@ -6,21 +6,24 @@ const EventStore = require('../../src/eventStore/eventStore');
 const should = chai.should(); // eslint-disable-line no-unused-vars
 chai.use(chaiAsPromised);
 
-/* eslint-disable no-undef */
+/* eslint-disable no-undef, object-curly-newline */
 
 const mysqlHost = 'localhost';
 const mysqlUser = 'root';
 const mysqlDatabase = 'damoori_integration_test';
 
-const truncateEventsTable = () => {
+const truncateEventsTable = () => new Promise((resolve, reject) => {
     const connection = mysql.createConnection({
         host: mysqlHost,
         user: mysqlUser,
         database: mysqlDatabase,
     });
     connection.connect();
-    connection.query('truncate table events');
-};
+    connection.query('truncate table events', (error) => {
+        if (error) reject(error);
+        resolve();
+    });
+});
 
 describe('Event store', () => {
     let eventStore;
@@ -35,9 +38,9 @@ describe('Event store', () => {
         it('throws an error if mysqlDatabase is null or undefined');
     });
 
-    describe('persistence and retrieval', () => {
-        beforeEach(() => {
-            truncateEventsTable();
+    describe('general persistence and retrieval', () => {
+        beforeEach((done) => {
+            truncateEventsTable().then(done);
         });
 
         it('it saves and retrieves one event', (done) => {
@@ -63,6 +66,42 @@ describe('Event store', () => {
                     const deltaSeconds = (Math.floor(currentDate.getTime() / 1000) -
                         Math.floor(createdDate.getTime() / 1000));
                     deltaSeconds.should.be.below(2);
+                })
+                .then(done)
+                .catch(done);
+        });
+
+        it('saves and retrieves multiple events', (done) => {
+            eventStore.saveEvents([
+                { type: 'ADD_BANANA', version: 1, namespace: '', body: {} },
+                { type: 'REMOVE_BANANA', version: 1, namespace: '', body: {} },
+                { type: 'ADD_ORANGE', version: 1, namespace: '', body: {} },
+                { type: 'AUGMENT_ORANGE', version: 1, namespace: '', body: {} },
+                { type: 'REMOVE_ORANGE', version: 1, namespace: '', body: {} },
+            ])
+                .then(() => eventStore.getEvents())
+                .then((events) => {
+                    events.should.have.lengthOf(5);
+
+                    let event = events.shift();
+                    event.sequenceId.should.equal(1);
+                    event.type.should.equal('ADD_BANANA');
+
+                    event = events.shift();
+                    event.sequenceId.should.equal(2);
+                    event.type.should.equal('REMOVE_BANANA');
+
+                    event = events.shift();
+                    event.sequenceId.should.equal(3);
+                    event.type.should.equal('ADD_ORANGE');
+
+                    event = events.shift();
+                    event.sequenceId.should.equal(4);
+                    event.type.should.equal('AUGMENT_ORANGE');
+
+                    event = events.shift();
+                    event.sequenceId.should.equal(5);
+                    event.type.should.equal('REMOVE_ORANGE');
                 })
                 .then(done)
                 .catch(done);

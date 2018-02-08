@@ -69,6 +69,27 @@ class EventStore {
             });
         });
     }
+
+    saveEvents(events) {
+        if (!Array.isArray(events)) throw new Error('events must be an array of events');
+        if (events.length === 0) return Promise.resolve();
+        if (events.length === 1) return this.saveEvent(events[0]);
+        const values = events.map((event) => {
+            const bodySerialized = JSON.stringify(event.body);
+            return `('${event.type}', ${event.version}, '${event.namespace}', '${bodySerialized}', UTC_TIMESTAMP())`;
+        });
+        const query = `insert into events(type, version, namespace, body, created_utc) values ${values.join(',')};`;
+        return new Promise((resolve, reject) => {
+            this.pool.getConnection((error, connection) => {
+                if (error) reject(error);
+                connection.query(query, (err) => {
+                    connection.release();
+                    if (err) reject(err);
+                    resolve();
+                });
+            });
+        });
+    }
 }
 
 module.exports = EventStore;
