@@ -8,7 +8,7 @@ class ReportCache {
     }
 
     getReport(key) {
-        const query = `SELECT key, last_sequence_id, report_body, updated_utc FROM report_cache WHERE key = '${key}'`;
+        const query = `SELECT key, last_sequence_id, body, updated_utc FROM report_cache WHERE key = '${key}'`;
         return new Promise((resolve, reject) => {
             this.database.get(query, (err, row) => {
                 if (err) reject(err);

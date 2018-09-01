@@ -1,7 +1,7 @@
 const rowToReport = row => ({
     key: row.key,
     lastSequenceId: row.last_sequence_id,
-    reportBody: JSON.parse(row.report_body),
+    body: JSON.parse(row.body),
     updatedUtc: new Date(row.updated_utc),
 });
 

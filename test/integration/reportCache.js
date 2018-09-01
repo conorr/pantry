@@ -91,7 +91,7 @@ describe('ReportCache', () => {
     });
 
     describe('round trip', () => {
-        it('sets and gets reportBody correctly when null', (done) => {
+        it('sets and gets body correctly when null', (done) => {
             report = {
                 key: 'foobar123',
                 lastSequenceId: 1,
@@ -102,24 +102,24 @@ describe('ReportCache', () => {
                 .then((report) => {
                     report.key.should.equal('foobar123');
                     // eslint-disable-next-line no-unused-expressions
-                    chai.expect(report.reportBody).to.be.null;
+                    chai.expect(report.body).to.be.null;
                 })
                 .then(done)
                 .catch(err => done(err));
         });
 
-        it('sets and gets reportBody correctly when valid JSON', (done) => {
+        it('sets and gets body correctly when valid JSON', (done) => {
             report = {
                 key: 'foobar123',
                 lastSequenceId: 1,
-                reportBody: { fruits: ['apples', 'oranges', 'bananas'] },
+                body: { fruits: ['apples', 'oranges', 'bananas'] },
             };
             reportCache
                 .saveReport(report)
                 .then(() => reportCache.getReport(report.key))
                 .then((report) => {
                     report.key.should.equal('foobar123');
-                    report.reportBody.should.eql({ fruits: ['apples', 'oranges', 'bananas'] });
+                    report.body.should.eql({ fruits: ['apples', 'oranges', 'bananas'] });
                 })
                 .then(done)
                 .catch(err => done(err));
