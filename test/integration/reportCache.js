@@ -29,7 +29,7 @@ describe('ReportCache', () => {
     let reportCache;
 
     before(() => {
-        db = new Database('pantry.db');
+        db = new Database(':memory:');
         createTable(db);
         reportCache = new ReportCache(db);
     });
