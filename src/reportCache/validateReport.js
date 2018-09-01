@@ -1,7 +1,7 @@
 const Joi = require('joi');
 
 const schema = Joi.object().keys({
-    key: Joi.string().min(1).max(255).required(),
+    cacheKey: Joi.string().min(1).max(255).required(),
     lastSequenceId: Joi.number().integer().required(),
     body: Joi.object().default(''),
 });

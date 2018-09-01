@@ -55,23 +55,23 @@ describe('ReportCache', () => {
 
         it('saves a report', (done) => {
             reportCache.saveReport({
-                key: 'foobar123',
+                cacheKey: 'foobar123',
                 lastSequenceId: 9,
             })
                 .then(() => reportCache.getReport('foobar123'))
                 .then((report) => {
-                    report.key.should.equal('foobar123');
+                    report.cacheKey.should.equal('foobar123');
                 })
                 .then(done)
                 .catch(err => done(err));
         });
 
         it('updates a report if the report already exists', (done) => {
-            reportCache.saveReport({ key: 'foobar123', lastSequenceId: 9 })
-                .then(() => reportCache.saveReport({ key: 'foobar123', lastSequenceId: 11 }))
+            reportCache.saveReport({ cacheKey: 'foobar123', lastSequenceId: 9 })
+                .then(() => reportCache.saveReport({ cacheKey: 'foobar123', lastSequenceId: 11 }))
                 .then(() => reportCache.getReport('foobar123'))
                 .then((report) => {
-                    report.key.should.equal('foobar123');
+                    report.cacheKey.should.equal('foobar123');
                     report.lastSequenceId.should.equal(11);
                 })
                 .then(done)
@@ -80,7 +80,7 @@ describe('ReportCache', () => {
 
         it('throws if passed an invalid report', () => {
             const badCall = () => reportCache.saveReport({
-                key: 'foobar123', // missing lastSequenceId
+                cacheKey: 'foobar123', // missing lastSequenceId
             });
             badCall.should.throw();
         });
@@ -89,17 +89,17 @@ describe('ReportCache', () => {
     describe('deleteReport', () => {
         it('deletes a report', (done) => {
             report = {
-                key: 'foobar123',
+                cacheKey: 'foobar123',
                 lastSequenceId: 1,
             };
             reportCache
                 .saveReport(report)
                 .then(() => reportCache.getReport('foobar123'))
                 .then((report) => {
-                    report.key.should.equal('foobar123');
+                    report.cacheKey.should.equal('foobar123');
                 })
                 .then(() => reportCache.deleteReport('foobar123'))
-                .then(() => reportCache.getReport(report.key))
+                .then(() => reportCache.getReport(report.cacheKey))
                 .then((report) => {
                     // eslint-disable-next-line no-unused-expressions
                     chai.expect(report).to.be.undefined;
@@ -112,14 +112,14 @@ describe('ReportCache', () => {
     describe('round trip', () => {
         it('sets and gets body correctly when null', (done) => {
             report = {
-                key: 'foobar123',
+                cacheKey: 'foobar123',
                 lastSequenceId: 1,
             };
             reportCache
                 .saveReport(report)
-                .then(() => reportCache.getReport(report.key))
+                .then(() => reportCache.getReport(report.cacheKey))
                 .then((report) => {
-                    report.key.should.equal('foobar123');
+                    report.cacheKey.should.equal('foobar123');
                     // eslint-disable-next-line no-unused-expressions
                     chai.expect(report.body).to.be.null;
                 })
@@ -129,15 +129,15 @@ describe('ReportCache', () => {
 
         it('sets and gets body correctly when valid JSON', (done) => {
             report = {
-                key: 'foobar123',
+                cacheKey: 'foobar123',
                 lastSequenceId: 1,
                 body: { fruits: ['apples', 'oranges', 'bananas'] },
             };
             reportCache
                 .saveReport(report)
-                .then(() => reportCache.getReport(report.key))
+                .then(() => reportCache.getReport(report.cacheKey))
                 .then((report) => {
-                    report.key.should.equal('foobar123');
+                    report.cacheKey.should.equal('foobar123');
                     report.body.should.eql({ fruits: ['apples', 'oranges', 'bananas'] });
                 })
                 .then(done)
