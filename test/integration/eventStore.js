@@ -1,70 +1,44 @@
-const mysql = require('mysql');
+const Database = require('sqlite3').Database;
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
 const EventStore = require('../../src/eventStore/eventStore');
+const createTableSql = require('../../src/eventStore/createTableSql');
 
 const should = chai.should(); // eslint-disable-line no-unused-vars
 chai.use(chaiAsPromised);
 
 /* eslint-disable no-undef, object-curly-newline */
 
-const mysqlHost = 'localhost';
-const mysqlUser = 'root';
-const mysqlDatabase = 'damoori_integration_test';
-
-const truncateEventsTable = () => new Promise((resolve, reject) => {
-    const connection = mysql.createConnection({
-        host: mysqlHost,
-        user: mysqlUser,
-        database: mysqlDatabase,
+createEventsTable = (db) => new Promise((resolve, reject) => {
+    db.run(createTableSql, (err) => {
+        if (err) reject(err);
+        resolve();
     });
-    connection.connect();
-    connection.query('truncate table events', (error) => {
-        if (error) reject(error);
+});
+
+truncateEventsTable = (db) => new Promise((resolve, reject) => {
+    db.run('DELETE FROM \'events\';', (err) => {
+        if (err) reject(err);
         resolve();
     });
 });
 
 describe('Event store', () => {
-    let eventStore;
 
-    before(() => {
-        eventStore = new EventStore(mysqlHost, mysqlUser, mysqlDatabase);
+    let eventStore;
+    let db;
+
+    before((done) => {
+        db = new Database(':memory:');
+        eventStore = new EventStore(db);
+        createEventsTable(db).then(done);
     });
 
-    describe('construction', () => {
-        it('throws an error if mysqlHost is null, undefined, or an empty string', () => {
-            const badCall1 = () => new EventStore(null, mysqlUser, mysqlDatabase);
-            const badCall2 = () => new EventStore(undefined, mysqlUser, mysqlDatabase);
-            const badCall3 = () => new EventStore('', mysqlUser, mysqlDatabase);
-            badCall1.should.throw();
-            badCall2.should.throw();
-            badCall3.should.throw();
-        });
-
-        it('throws an error if mysqlUser is null, undefined, or an empty string', () => {
-            const badCall1 = () => new EventStore(mysqlHost, null, mysqlDatabase);
-            const badCall2 = () => new EventStore(mysqlHost, undefined, mysqlDatabase);
-            const badCall3 = () => new EventStore(mysqlHost, '', mysqlDatabase);
-            badCall1.should.throw();
-            badCall2.should.throw();
-            badCall3.should.throw();
-        });
-
-        it('throws an error if mysqlDatabase is null, undefined, or an empty string', () => {
-            const badCall1 = () => new EventStore(mysqlHost, mysqlUser, null);
-            const badCall2 = () => new EventStore(mysqlHost, mysqlUser, undefined);
-            const badCall3 = () => new EventStore(mysqlHost, mysqlUser, '');
-            badCall1.should.throw();
-            badCall2.should.throw();
-            badCall3.should.throw();
-        });
+    beforeEach((done) => {
+        truncateEventsTable(db).then(done);
     });
 
     describe('end to end', () => {
-        beforeEach((done) => {
-            truncateEventsTable().then(done);
-        });
 
         it('saves and retrieves one event', (done) => {
             eventStore.saveEvent({
@@ -126,13 +100,14 @@ describe('Event store', () => {
                     event.sequenceId.should.equal(5);
                     event.type.should.equal('REMOVE_ORANGE');
                 })
-                .then(done)
-                .catch(done);
+                .then(() => done())
+                .catch((err) => done(err));
         });
+
     });
 
-    describe('getEvent', (done) => {
-        it('gets correct event by sequenceId', () => {
+    describe('getEvent', () => {
+        it('gets correct event by sequenceId', (done) => {
             eventStore.saveEvents([
                 { type: 'ADD_BANANA', version: 1, namespace: '', body: {} },
                 { type: 'REMOVE_BANANA', version: 1, namespace: '', body: {} },
@@ -144,15 +119,15 @@ describe('Event store', () => {
                 .then((event) => {
                     event.type.should.equal('ADD_ORANGE');
                 })
-                .then(done)
-                .catch(done);
+                .then(() => done())
+                .catch((err) => done(err));
         });
     });
 
-    describe('getEvents', (done) => {
-        it('gets a slice of events correctly', () => {
+    describe('getEvents', () => {
+        it('gets a slice of events correctly', (done) => {
             eventStore.saveEvents([
-                { type: 'ADD_BANANA', version: 1, namespace: '', body: {} },
+                { type: 'ADD_BANANA', version: 1, namespace: '', body: {foo: 'bar'} },
                 { type: 'REMOVE_BANANA', version: 1, namespace: '', body: {} },
                 { type: 'ADD_ORANGE', version: 1, namespace: '', body: {} },
                 { type: 'AUGMENT_ORANGE', version: 1, namespace: '', body: {} },
@@ -174,28 +149,34 @@ describe('Event store', () => {
                     event.sequenceId.should.equal(5);
                     event.type.should.equal('REMOVE_ORANGE');
                 })
-                .then(done)
-                .catch(done);
+                .then(() => done())
+                .catch((err) => done(err));
         });
     });
 
     describe('saveEvents', () => {
+
         before((done) => {
             eventStore.saveEvent({
                 type: 'AUGMENT_ORANGE',
                 version: 1,
                 namespace: '',
                 body: {},
-            }).then(done);
+            })
+                .then(() => done())
+                .catch((err) => done(err));
         });
 
-        it('throws an error if not passed an array', () => {
+        it('throws an error if not passed an array', (done) => {
             const badCall = () => eventStore.saveEvents('oops');
             badCall.should.throw();
+            done();
         });
 
         it('returns a resolved promise if passed an empty array', (done) => {
-            eventStore.saveEvents([]).then(done);
+            eventStore.saveEvents([])
+                .then(() => done())
+                .catch((err) => done(err));
         });
     });
 });

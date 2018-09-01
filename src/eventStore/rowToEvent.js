@@ -4,7 +4,7 @@ const rowToEvent = row => ({
     version: row.version,
     namespace: row.namespace,
     body: JSON.parse(row.body),
-    createdUtc: row.created_utc.toISOString(),
+    createdUtc: new Date(row.created_utc),
 });
 
 module.exports = rowToEvent;
