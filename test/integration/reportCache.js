@@ -1,0 +1,128 @@
+const chai = require('chai');
+const chaiAsPromised = require('chai-as-promised');
+const { Database } = require('sqlite3');
+const ReportCache = require('../../src/reportCache/reportCache');
+const createTableSql = require('../../src/reportCache/createTableSql');
+
+/* eslint-disable no-undef, object-curly-newline */
+
+chai.use(chaiAsPromised);
+chai.should();
+
+const createTable = db => new Promise((resolve, reject) => {
+    db.run(createTableSql, (err) => {
+        if (err) reject(err);
+        resolve();
+    });
+});
+
+const truncateTable = db => new Promise((resolve, reject) => {
+    db.run('DELETE FROM report_cache;', (err) => {
+        if (err) reject(err);
+        resolve();
+    });
+});
+
+
+describe('ReportCache', () => {
+    let db;
+    let reportCache;
+
+    before(() => {
+        db = new Database('pantry.db');
+        createTable(db);
+        reportCache = new ReportCache(db);
+    });
+
+    xdescribe('getReport', () => {
+        beforeEach((done) => {
+            truncateTable(db).then(done);
+        });
+
+        it('gets a report', () => {
+            reportCache.saveReport({
+            });
+        });
+
+        it('returns undefined if the report is not found');
+        it('throws if passed an undefined cache key');
+    });
+
+    describe('saveReport', () => {
+        beforeEach((done) => {
+            truncateTable(db).then(done);
+        });
+
+        it('saves a report', (done) => {
+            reportCache.saveReport({
+                cacheKey: 'foobar123',
+                lastSequenceId: 9,
+            })
+                .then(() => reportCache.getReport('foobar123'))
+                .then((report) => {
+                    report.cacheKey.should.equal('foobar123');
+                })
+                .then(done)
+                .catch(err => done(err));
+        });
+
+        it('updates a report if the report already exists', (done) => {
+            reportCache.saveReport({ cacheKey: 'foobar123', lastSequenceId: 9 })
+                .then(() => reportCache.saveReport({ cacheKey: 'foobar123', lastSequenceId: 11 }))
+                .then(() => reportCache.getReport('foobar123'))
+                .then((report) => {
+                    report.cacheKey.should.equal('foobar123');
+                    report.lastSequenceId.should.equal(11);
+                })
+                .then(done)
+                .catch(err => done(err));
+        });
+
+        it('throws if passed an invalid report', () => {
+            const badCall = () => reportCache.saveReport({
+                cacheKey: 'foobar123', // missing lastSequenceId
+            });
+            badCall.should.throw();
+        });
+    });
+
+    describe('deleteReport', () => {
+        it('deletes a report');
+    });
+
+    describe('round trip', () => {
+        it('sets and gets reportBody correctly when null', (done) => {
+            report = {
+                cacheKey: 'foobar123',
+                lastSequenceId: 1,
+            };
+            reportCache
+                .saveReport(report)
+                .then(() => reportCache.getReport(report.cacheKey))
+                .then((report) => {
+                    report.cacheKey.should.equal('foobar123');
+                    // eslint-disable-next-line no-unused-expressions
+                    chai.expect(report.reportBody).to.be.null;
+                })
+                .then(done)
+                .catch(err => done(err));
+        });
+
+        it('sets and gets reportBody correctly when valid JSON', (done) => {
+            report = {
+                cacheKey: 'foobar123',
+                lastSequenceId: 1,
+                reportBody: { fruits: ['apples', 'oranges', 'bananas'] },
+            };
+            reportCache
+                .saveReport(report)
+                .then(() => reportCache.getReport(report.cacheKey))
+                .then((report) => {
+                    report.cacheKey.should.equal('foobar123');
+                    report.reportBody.should.eql({ fruits: ['apples', 'oranges', 'bananas'] });
+                })
+                .then(done)
+                .catch(err => done(err));
+        });
+    });
+});

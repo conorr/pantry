@@ -7,4 +7,4 @@ const createTableSql = `CREATE TABLE IF NOT EXISTS 'report_cache' (
     PRIMARY KEY('id')
 );`;
 
-export default createTableSql;
+module.exports = createTableSql;

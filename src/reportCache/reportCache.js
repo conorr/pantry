@@ -20,10 +20,10 @@ class ReportCache {
 
     saveReport(report) {
         validateReport(report);
-        this.getReport(report.cacheKey).then((existingReport) => {
-            const query = existingReport ?
-                getUpdateQuery(report) : getInsertQuery(report);
-            return new Promise((resolve, reject) => {
+        return new Promise((resolve, reject) => {
+            this.getReport(report.cacheKey).then((existingReport) => {
+                const query = existingReport ?
+                    getUpdateQuery(report) : getInsertQuery(report);
                 this.database.run(query, (err) => {
                     if (err) reject(err);
                     resolve();
