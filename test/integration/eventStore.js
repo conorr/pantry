@@ -1,22 +1,22 @@
-const Database = require('sqlite3').Database;
+const { Database } = require('sqlite3');
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
 const EventStore = require('../../src/eventStore/eventStore');
 const createTableSql = require('../../src/eventStore/createTableSql');
 
-const should = chai.should(); // eslint-disable-line no-unused-vars
 chai.use(chaiAsPromised);
+chai.should();
 
 /* eslint-disable no-undef, object-curly-newline */
 
-createEventsTable = (db) => new Promise((resolve, reject) => {
+createEventsTable = db => new Promise((resolve, reject) => {
     db.run(createTableSql, (err) => {
         if (err) reject(err);
         resolve();
     });
 });
 
-truncateEventsTable = (db) => new Promise((resolve, reject) => {
+truncateEventsTable = db => new Promise((resolve, reject) => {
     db.run('DELETE FROM \'events\';', (err) => {
         if (err) reject(err);
         resolve();
@@ -24,7 +24,6 @@ truncateEventsTable = (db) => new Promise((resolve, reject) => {
 });
 
 describe('Event store', () => {
-
     let eventStore;
     let db;
 
@@ -39,7 +38,6 @@ describe('Event store', () => {
     });
 
     describe('end to end', () => {
-
         it('saves and retrieves one event', (done) => {
             eventStore.saveEvent({
                 type: 'HELLO_WORLD',
@@ -101,9 +99,8 @@ describe('Event store', () => {
                     event.type.should.equal('REMOVE_ORANGE');
                 })
                 .then(() => done())
-                .catch((err) => done(err));
+                .catch(err => done(err));
         });
-
     });
 
     describe('getEvent', () => {
@@ -120,14 +117,14 @@ describe('Event store', () => {
                     event.type.should.equal('ADD_ORANGE');
                 })
                 .then(() => done())
-                .catch((err) => done(err));
+                .catch(err => done(err));
         });
     });
 
     describe('getEvents', () => {
         it('gets a slice of events correctly', (done) => {
             eventStore.saveEvents([
-                { type: 'ADD_BANANA', version: 1, namespace: '', body: {foo: 'bar'} },
+                { type: 'ADD_BANANA', version: 1, namespace: '', body: { foo: 'bar' } },
                 { type: 'REMOVE_BANANA', version: 1, namespace: '', body: {} },
                 { type: 'ADD_ORANGE', version: 1, namespace: '', body: {} },
                 { type: 'AUGMENT_ORANGE', version: 1, namespace: '', body: {} },
@@ -150,12 +147,11 @@ describe('Event store', () => {
                     event.type.should.equal('REMOVE_ORANGE');
                 })
                 .then(() => done())
-                .catch((err) => done(err));
+                .catch(err => done(err));
         });
     });
 
     describe('saveEvents', () => {
-
         before((done) => {
             eventStore.saveEvent({
                 type: 'AUGMENT_ORANGE',
@@ -164,7 +160,7 @@ describe('Event store', () => {
                 body: {},
             })
                 .then(() => done())
-                .catch((err) => done(err));
+                .catch(err => done(err));
         });
 
         it('throws an error if not passed an array', (done) => {
@@ -176,7 +172,7 @@ describe('Event store', () => {
         it('returns a resolved promise if passed an empty array', (done) => {
             eventStore.saveEvents([])
                 .then(() => done())
-                .catch((err) => done(err));
+                .catch(err => done(err));
         });
     });
 });

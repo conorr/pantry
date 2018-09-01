@@ -4,7 +4,7 @@ const { Database } = require('sqlite3');
 const ReportCache = require('../../src/reportCache/reportCache');
 const createTableSql = require('../../src/reportCache/createTableSql');
 
-/* eslint-disable no-undef, object-curly-newline */
+/* eslint-disable no-undef */
 
 chai.use(chaiAsPromised);
 chai.should();
