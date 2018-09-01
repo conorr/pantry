@@ -28,24 +28,45 @@ describe('ReportCache', () => {
     let db;
     let reportCache;
 
-    before(() => {
+    before((done) => {
         db = new Database(':memory:');
-        createTable(db);
         reportCache = new ReportCache(db);
+        createTable(db).then(done);
     });
 
-    xdescribe('getReport', () => {
+    describe('getReport', () => {
         beforeEach((done) => {
             truncateTable(db).then(done);
         });
 
-        it('gets a report', () => {
+        it('gets a report', (done) => {
             reportCache.saveReport({
-            });
+                cacheKey: 'foobar123',
+                lastSequenceId: 9,
+            })
+                .then(() => reportCache.getReport('foobar123'))
+                .then((report) => {
+                    report.cacheKey.should.equal('foobar123');
+                })
+                .then(done)
+                .catch(err => done(err));
         });
 
-        it('returns undefined if the report is not found');
-        it('throws if passed an undefined cache key');
+        it('returns undefined if the report is not found', (done) => {
+            reportCache
+                .getReport('xyz123')
+                .then((report) => {
+                    // eslint-disable-next-line no-unused-expressions
+                    chai.expect(report).to.be.undefined;
+                })
+                .then(done)
+                .catch(err => done(err));
+        });
+
+        it('throws if passed an undefined cache key', () => {
+            const badCall = () => reportCache.getReport();
+            badCall.should.throw();
+        });
     });
 
     describe('saveReport', () => {

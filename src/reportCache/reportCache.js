@@ -8,6 +8,7 @@ class ReportCache {
     }
 
     getReport(cacheKey) {
+        if (!cacheKey) throw new Error('cacheKey cannot be null or undefined');
         const query = `SELECT cache_key, last_sequence_id, body, updated_utc FROM report_cache WHERE cache_key = '${cacheKey}'`;
         return new Promise((resolve, reject) => {
             this.database.get(query, (err, row) => {
