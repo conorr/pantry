@@ -31,6 +31,16 @@ class ReportCache {
             });
         });
     }
+
+    deleteReport(key) {
+        const query = `DELETE FROM report_cache WHERE key = '${key}'`;
+        return new Promise((resolve, reject) => {
+            this.database.run(query, (err) => {
+                if (err) reject(err);
+                resolve();
+            });
+        });
+    }
 }
 
 module.exports = ReportCache;

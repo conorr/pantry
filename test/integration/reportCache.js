@@ -87,7 +87,26 @@ describe('ReportCache', () => {
     });
 
     describe('deleteReport', () => {
-        it('deletes a report');
+        it('deletes a report', (done) => {
+            report = {
+                key: 'foobar123',
+                lastSequenceId: 1,
+            };
+            reportCache
+                .saveReport(report)
+                .then(() => reportCache.getReport('foobar123'))
+                .then((report) => {
+                    report.key.should.equal('foobar123');
+                })
+                .then(() => reportCache.deleteReport('foobar123'))
+                .then(() => reportCache.getReport(report.key))
+                .then((report) => {
+                    // eslint-disable-next-line no-unused-expressions
+                    chai.expect(report).to.be.undefined;
+                })
+                .then(done)
+                .catch(err => done(err));
+        });
     });
 
     describe('round trip', () => {
