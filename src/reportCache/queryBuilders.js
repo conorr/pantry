@@ -1,3 +1,8 @@
+const getSelectQuery = (cacheKey) => {
+    const query = `SELECT cache_key, last_sequence_id, body, updated_utc FROM report_cache WHERE cache_key = '${cacheKey}'`;
+    return query;
+};
+
 const getInsertQuery = (report) => {
     const nowUtc = new Date().toISOString();
     const reportBodyJson = report.body ? `'${JSON.stringify(report.body)}'` : null;
@@ -13,6 +18,7 @@ const getUpdateQuery = (report) => {
 };
 
 module.exports = {
+    getSelectQuery,
     getInsertQuery,
     getUpdateQuery,
 };
