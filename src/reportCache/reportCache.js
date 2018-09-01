@@ -4,14 +4,14 @@ const validateReport = require('./validateReport');
 const getUpdateQuery = (report) => {
     const nowUtc = new Date().toISOString();
     const reportBodyJson = JSON.stringify(report.reportBody);
-    const query = `update report_cache set last_sequence_id = '${report.lastSequenceId}', report_body = '${reportBodyJson}', updated_utc = '${nowUtc}' where cache_key = '${report.cacheKey}'`;
+    const query = `UPDATE report_cache SET last_sequence_id = '${report.lastSequenceId}', report_body = '${reportBodyJson}', updated_utc = '${nowUtc}' WHERE cache_key = '${report.cacheKey}'`;
     return query;
 };
 
 const getInsertQuery = (report) => {
     const nowUtc = new Date().toISOString();
     const reportBodyJson = JSON.stringify(report.reportBody);
-    const query = `insert into report_cache (cache_key, last_sequence_id, report_body, updated_utc) values ('${report.cacheKey}', ${report.lastSequenceId}, '${reportBodyJson}', '${nowUtc}')`;
+    const query = `INSERT INTO report_cache (cache_key, last_sequence_id, report_body, updated_utc) VALUES ('${report.cacheKey}', ${report.lastSequenceId}, '${reportBodyJson}', '${nowUtc}')`;
     return query;
 };
 
@@ -21,7 +21,7 @@ class ReportCache {
     }
 
     getReport(cacheKey) {
-        const query = `select * from report_cache where cache_key = '${cacheKey}'`;
+        const query = `SELECT cache_key, last_sequence_id, report_body, updated_utc FROM report_cache WHERE cache_key = '${cacheKey}'`;
         return new Promise((resolve, reject) => {
             this.database.get(query, (err, row) => {
                 if (err) reject(err);
