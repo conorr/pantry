@@ -55,23 +55,23 @@ describe('ReportCache', () => {
 
         it('saves a report', (done) => {
             reportCache.saveReport({
-                cacheKey: 'foobar123',
+                key: 'foobar123',
                 lastSequenceId: 9,
             })
                 .then(() => reportCache.getReport('foobar123'))
                 .then((report) => {
-                    report.cacheKey.should.equal('foobar123');
+                    report.key.should.equal('foobar123');
                 })
                 .then(done)
                 .catch(err => done(err));
         });
 
         it('updates a report if the report already exists', (done) => {
-            reportCache.saveReport({ cacheKey: 'foobar123', lastSequenceId: 9 })
-                .then(() => reportCache.saveReport({ cacheKey: 'foobar123', lastSequenceId: 11 }))
+            reportCache.saveReport({ key: 'foobar123', lastSequenceId: 9 })
+                .then(() => reportCache.saveReport({ key: 'foobar123', lastSequenceId: 11 }))
                 .then(() => reportCache.getReport('foobar123'))
                 .then((report) => {
-                    report.cacheKey.should.equal('foobar123');
+                    report.key.should.equal('foobar123');
                     report.lastSequenceId.should.equal(11);
                 })
                 .then(done)
@@ -80,7 +80,7 @@ describe('ReportCache', () => {
 
         it('throws if passed an invalid report', () => {
             const badCall = () => reportCache.saveReport({
-                cacheKey: 'foobar123', // missing lastSequenceId
+                key: 'foobar123', // missing lastSequenceId
             });
             badCall.should.throw();
         });
@@ -93,14 +93,14 @@ describe('ReportCache', () => {
     describe('round trip', () => {
         it('sets and gets reportBody correctly when null', (done) => {
             report = {
-                cacheKey: 'foobar123',
+                key: 'foobar123',
                 lastSequenceId: 1,
             };
             reportCache
                 .saveReport(report)
-                .then(() => reportCache.getReport(report.cacheKey))
+                .then(() => reportCache.getReport(report.key))
                 .then((report) => {
-                    report.cacheKey.should.equal('foobar123');
+                    report.key.should.equal('foobar123');
                     // eslint-disable-next-line no-unused-expressions
                     chai.expect(report.reportBody).to.be.null;
                 })
@@ -110,15 +110,15 @@ describe('ReportCache', () => {
 
         it('sets and gets reportBody correctly when valid JSON', (done) => {
             report = {
-                cacheKey: 'foobar123',
+                key: 'foobar123',
                 lastSequenceId: 1,
                 reportBody: { fruits: ['apples', 'oranges', 'bananas'] },
             };
             reportCache
                 .saveReport(report)
-                .then(() => reportCache.getReport(report.cacheKey))
+                .then(() => reportCache.getReport(report.key))
                 .then((report) => {
-                    report.cacheKey.should.equal('foobar123');
+                    report.key.should.equal('foobar123');
                     report.reportBody.should.eql({ fruits: ['apples', 'oranges', 'bananas'] });
                 })
                 .then(done)

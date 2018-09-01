@@ -7,8 +7,8 @@ class ReportCache {
         this.database = database;
     }
 
-    getReport(cacheKey) {
-        const query = `SELECT cache_key, last_sequence_id, report_body, updated_utc FROM report_cache WHERE cache_key = '${cacheKey}'`;
+    getReport(key) {
+        const query = `SELECT key, last_sequence_id, report_body, updated_utc FROM report_cache WHERE key = '${key}'`;
         return new Promise((resolve, reject) => {
             this.database.get(query, (err, row) => {
                 if (err) reject(err);
@@ -21,7 +21,7 @@ class ReportCache {
     saveReport(report) {
         validateReport(report);
         return new Promise((resolve, reject) => {
-            this.getReport(report.cacheKey).then((existingReport) => {
+            this.getReport(report.key).then((existingReport) => {
                 const query = existingReport ?
                     getUpdateQuery(report) : getInsertQuery(report);
                 this.database.run(query, (err) => {
