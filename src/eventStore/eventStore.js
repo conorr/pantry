@@ -33,8 +33,8 @@ class EventStore {
     saveEvent(event) {
         validateEvent(event);
         const bodySerialized = JSON.stringify(event.body);
-        const utcDatetime = new Date().toISOString();
-        const query = `insert into events(type, version, namespace, body, created_utc) values ('${event.type}', ${event.version}, '${event.namespace}', '${bodySerialized}', '${utcDatetime}')`;
+        const nowUtc = new Date().toISOString();
+        const query = `insert into events(type, version, namespace, body, created_utc) values ('${event.type}', ${event.version}, '${event.namespace}', '${bodySerialized}', '${nowUtc}')`;
         this.database.run(query);
         return Promise.resolve();
     }
@@ -43,10 +43,10 @@ class EventStore {
         if (!Array.isArray(events)) throw new Error('events must be an array of events');
         if (events.length === 0) return Promise.resolve();
         if (events.length === 1) return this.saveEvent(events[0]);
-        const utcDatetime = new Date().toISOString();
+        const nowUtc = new Date().toISOString();
         const values = events.map((event) => {
             const bodySerialized = JSON.stringify(event.body);
-            return `('${event.type}', ${event.version}, '${event.namespace}', '${bodySerialized}', '${utcDatetime}')`;
+            return `('${event.type}', ${event.version}, '${event.namespace}', '${bodySerialized}', '${nowUtc}')`;
         });
         const query = `insert into events(type, version, namespace, body, created_utc) values ${values.join(',')};`;
         return new Promise((resolve, reject) => {
