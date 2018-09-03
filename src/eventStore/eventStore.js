@@ -24,7 +24,7 @@ class EventStore {
         return new Promise((resolve, reject) => {
             this.database.all(query, (err, rows) => {
                 if (err) reject(err);
-                const events = rows.map(rowToEvent);
+                const events = rows ? rows.map(rowToEvent) : [];
                 resolve(events);
             });
         });
