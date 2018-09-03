@@ -2,7 +2,7 @@ const cacheKey = 'inventory_report';
 
 const defaultReport = {};
 
-const accumulator = (report, event) => {
+const reducer = (report, event) => {
     report.t = event;
     return report;
 };
@@ -10,5 +10,5 @@ const accumulator = (report, event) => {
 module.exports = {
     cacheKey,
     defaultReport,
-    accumulator,
+    reducer,
 };

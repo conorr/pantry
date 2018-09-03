@@ -30,9 +30,4 @@ class ReportBuilder {
     }
 }
 
-const { cacheKey, accumulator, defaultReport } = require('./inventoryReport');
-
-const reportBuilder = new ReportBuilder();
-reportBuilder.buildReport(cacheKey, accumulator, defaultReport);
-
 module.exports = ReportBuilder;
