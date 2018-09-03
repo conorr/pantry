@@ -10,7 +10,7 @@ class ReportBuilder {
                 .then((report) => {
                     const lastSequenceId = report ? report.lastSequenceId : 0;
 
-                    this.eventStore.getEvents(lastSequenceId)
+                    this.eventStore.getEvents(lastSequenceId + 1)
                         .then((events) => {
                             if (events.length === 0) resolve(report);
 
@@ -19,8 +19,10 @@ class ReportBuilder {
                                 report || defaultReport,
                             );
 
+                            updatedReport.lastSequenceId = events[events.length - 1].sequenceId;
+
                             this.reportCache
-                                .saveReport(cacheKey, updatedReport)
+                                .saveReport(updatedReport)
                                 .then(() => resolve(updatedReport));
                         })
                         .catch(err => reject(err));
