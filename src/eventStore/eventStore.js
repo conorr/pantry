@@ -39,7 +39,6 @@ class EventStore {
     saveEvent(event) {
         validateEvent(event);
         const query = buildSaveEventQuery(event);
-        console.log(query);
         return new Promise((resolve, reject) => {
             this.database.run(query, (err) => {
                 if (err) reject(err);
