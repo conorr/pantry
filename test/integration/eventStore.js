@@ -1,8 +1,8 @@
 const { Database } = require('sqlite3');
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
-const EventStore = require('../../src/eventStore/eventStore');
-const createTableSql = require('../../src/eventStore/createTableSql');
+const EventStore = require('../../src/stores/eventStore/eventStore');
+const createTableSql = require('../../src/stores/eventStore/createTableSql');
 
 chai.use(chaiAsPromised);
 chai.should();

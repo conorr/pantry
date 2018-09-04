@@ -1,9 +1,9 @@
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
 const { Database } = require('sqlite3');
-const EventStore = require('../../src/eventStore/eventStore');
+const EventStore = require('../../src/stores/eventStore/eventStore');
 const ReportBuilder = require('../../src/reporting/reportBuilder');
-const ReportCache = require('../../src/reportCache/reportCache');
+const ReportCache = require('../../src/stores/reportCache/reportCache');
 
 /* eslint-disable no-undef, no-unused-expressions */
 

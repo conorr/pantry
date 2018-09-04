@@ -1,8 +1,8 @@
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
 const { Database } = require('sqlite3');
-const ReportCache = require('../../src/reportCache/reportCache');
-const createTableSql = require('../../src/reportCache/createTableSql');
+const ReportCache = require('../../src/stores/reportCache/reportCache');
+const createTableSql = require('../../src/stores/reportCache/createTableSql');
 
 /* eslint-disable no-undef */
 

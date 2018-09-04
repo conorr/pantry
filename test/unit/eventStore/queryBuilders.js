@@ -1,6 +1,6 @@
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
-const { buildSaveEventQuery } = require('../../../src/eventStore/queryBuilders');
+const { buildSaveEventQuery } = require('../../../src/stores/eventStore/queryBuilders');
 
 chai.use(chaiAsPromised);
 chai.should();
