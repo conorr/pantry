@@ -1,5 +1,11 @@
 const validateEvent = require('./validateEvent');
 const rowToEvent = require('./rowToEvent');
+const {
+    buildSelectEventQuery,
+    buildSelectEventsQuery,
+    buildSaveEventQuery,
+    buildSaveEventsQuery,
+} = require('./queryBuilders');
 
 class EventStore {
     constructor(database) {
@@ -7,7 +13,7 @@ class EventStore {
     }
 
     getEvent(sequenceId) {
-        const query = `select * from events where sequence_id = ${sequenceId}`;
+        const query = buildSelectEventQuery(sequenceId);
         return new Promise((resolve, reject) => {
             this.database.get(query, (err, row) => {
                 if (err) reject(err);
@@ -20,7 +26,7 @@ class EventStore {
     getEvents(sequenceIdStart = 0, top = 100) {
         if (sequenceIdStart < 0) throw new Error('sequenceIdStart must be zero or greater');
         if (top < 0) throw new Error('top must be zero or greater');
-        const query = `select * from events where sequence_id >= ${sequenceIdStart} order by sequence_id asc limit ${top}`;
+        const query = buildSelectEventsQuery(sequenceIdStart, top);
         return new Promise((resolve, reject) => {
             this.database.all(query, (err, rows) => {
                 if (err) reject(err);
@@ -32,23 +38,21 @@ class EventStore {
 
     saveEvent(event) {
         validateEvent(event);
-        const bodySerialized = JSON.stringify(event.body);
-        const nowUtc = new Date().toISOString();
-        const query = `insert into events(type, version, namespace, body, created_utc) values ('${event.type}', ${event.version}, '${event.namespace}', '${bodySerialized}', '${nowUtc}')`;
-        this.database.run(query);
-        return Promise.resolve();
+        const query = buildSaveEventQuery(event);
+        console.log(query);
+        return new Promise((resolve, reject) => {
+            this.database.run(query, (err) => {
+                if (err) reject(err);
+                resolve();
+            });
+        });
     }
 
     saveEvents(events) {
         if (!Array.isArray(events)) throw new Error('events must be an array of events');
         if (events.length === 0) return Promise.resolve();
         if (events.length === 1) return this.saveEvent(events[0]);
-        const nowUtc = new Date().toISOString();
-        const values = events.map((event) => {
-            const bodySerialized = JSON.stringify(event.body);
-            return `('${event.type}', ${event.version}, '${event.namespace}', '${bodySerialized}', '${nowUtc}')`;
-        });
-        const query = `insert into events(type, version, namespace, body, created_utc) values ${values.join(',')};`;
+        const query = buildSaveEventsQuery(events);
         return new Promise((resolve, reject) => {
             this.database.run(query, (err) => {
                 if (err) reject(err);
