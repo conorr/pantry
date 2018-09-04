@@ -16,9 +16,9 @@ class ReportBuilder {
 
     buildReport(cacheKey, reportBodyReducer) {
         return this.reportCache.getReport(cacheKey)
-            .then((report) => {
-                const lastSequenceId = report ? report.lastSequenceId : 0;
-                return this.eventStore.getEvents(lastSequenceId + 1)
+            .then((cachedReport) => {
+                const report = cachedReport || initializeReport(cacheKey);
+                return this.eventStore.getEvents(report.lastSequenceId + 1)
                     .then(events => (
                         {
                             report: report || initializeReport(cacheKey),
@@ -28,16 +28,12 @@ class ReportBuilder {
             })
             .then(({ report, events }) => {
                 if (events.length === 0) return Promise.resolve(report);
-
-                const updatedReport = {
-                    cacheKey,
-                    lastSequenceId: events[events.length - 1].sequenceId,
-                    body: events.reduce(reportBodyReducer, report.body),
-                };
-
+                const lastSequenceId = events[events.length - 1].sequenceId;
+                const body = events.reduce(reportBodyReducer, report.body);
+                const newReport = { cacheKey, lastSequenceId, body };
                 return this.reportCache
-                    .saveReport(updatedReport)
-                    .then(() => updatedReport);
+                    .saveReport(newReport)
+                    .then(() => newReport);
             });
     }
 }
