@@ -2,7 +2,7 @@ const cacheKey = 'inventory_report';
 
 const defaultReport = {};
 
-const reducer = (report, event) => {
+const reportBodyreducer = (report, event) => {
     report.t = event;
     return report;
 };
@@ -10,5 +10,5 @@ const reducer = (report, event) => {
 module.exports = {
     cacheKey,
     defaultReport,
-    reducer,
+    reportBodyreducer,
 };

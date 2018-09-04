@@ -38,17 +38,13 @@ describe('reportBuilder', () => {
     });
 
     it('end to end', (done) => {
-        reducer = (report, event) => {
-            const updatedReport = Object.assign({}, report);
-            updatedReport.body.count += event.body.amount;
-            return updatedReport;
+        reducer = (reportBody, event) => {
+            const newReportBody = Object.assign({}, reportBody);
+            if (!newReportBody.count) newReportBody.count = 0;
+            newReportBody.count += event.body.amount;
+            return newReportBody;
         };
-        initialReport = {
-            cacheKey: 'fruitReport',
-            lastSequenceId: 0,
-            body: { count: 0 },
-        };
-        reportBuilder.buildReport('fruitReport', reducer, initialReport)
+        reportBuilder.buildReport('fruitReport', reducer)
             .then((report) => {
                 chai.expect(report).to.be.undefined;
             })
@@ -57,7 +53,7 @@ describe('reportBuilder', () => {
                 { type: 'FRUIT_ADDED', body: { amount: 1 } },
                 { type: 'FRUIT_ADDED', body: { amount: 7 } },
             ]))
-            .then(() => reportBuilder.buildReport('fruitReport', reducer, initialReport))
+            .then(() => reportBuilder.buildReport('fruitReport', reducer))
             .then((report) => {
                 report.body.count.should.equal(10);
             })
@@ -68,11 +64,11 @@ describe('reportBuilder', () => {
                     { type: 'FRUIT_ADDED', body: { amount: -1 } },
                 ]);
             })
-            .then(() => reportBuilder.buildReport('fruitReport', reducer, initialReport))
+            .then(() => reportBuilder.buildReport('fruitReport', reducer))
             .then((report) => {
                 report.body.count.should.equal(14);
             })
-            .then(() => reportBuilder.buildReport('fruitReport', reducer, initialReport))
+            .then(() => reportBuilder.buildReport('fruitReport', reducer))
             .then((report) => {
                 report.body.count.should.equal(14);
             })
