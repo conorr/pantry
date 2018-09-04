@@ -46,7 +46,9 @@ describe('reportBuilder', () => {
         };
         reportBuilder.buildReport('fruitReport', reducer)
             .then((report) => {
-                chai.expect(report).to.be.undefined;
+                report.cacheKey.should.equal('fruitReport');
+                report.lastSequenceId.should.equal(0);
+                report.body.should.eql({});
             })
             .then(() => eventStore.saveEvents([
                 { type: 'FRUIT_ADDED', body: { amount: 2 } },
