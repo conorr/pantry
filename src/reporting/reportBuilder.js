@@ -29,14 +29,11 @@ class ReportBuilder {
             .then(({ report, events }) => {
                 if (events.length === 0) return Promise.resolve(report);
 
-                const updatedReport = Object.assign({}, report);
-
-                updatedReport.body = events.reduce(
-                    reportBodyReducer,
-                    updatedReport ? updatedReport.body : {},
-                );
-
-                updatedReport.lastSequenceId = events[events.length - 1].sequenceId;
+                const updatedReport = {
+                    cacheKey,
+                    lastSequenceId: events[events.length - 1].sequenceId,
+                    body: events.reduce(reportBodyReducer, report.body),
+                };
 
                 return this.reportCache
                     .saveReport(updatedReport)
