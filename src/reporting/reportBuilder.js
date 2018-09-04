@@ -25,7 +25,7 @@ class ReportBuilder {
                     ));
             })
             .then(({ report, events }) => {
-                if (events.length === 0) return report;
+                if (events.length === 0) return Promise.resolve(report);
 
                 const updatedReport = Object.assign({}, report);
 
