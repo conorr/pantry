@@ -11,13 +11,13 @@ const buildSelectEventsQuery = (sequenceIdStart, top) => {
 
 const isString = val => typeof val === 'string';
 
-const isObject = obj => typeof obj === 'object';
+const isDefinedObject = obj => obj && typeof obj === 'object';
 
 const quoteString = str => `'${str}'`;
 
 const prepareStringValue = str => (isString(str) ? quoteString(str) : 'null');
 
-const prepareObjectValue = obj => (isObject(obj) ? quoteString(JSON.stringify(obj)) : 'null');
+const prepareObjectValue = obj => (isDefinedObject(obj) ? quoteString(JSON.stringify(obj)) : 'null');
 
 
 const buildInsertRow = (event) => {
@@ -26,7 +26,7 @@ const buildInsertRow = (event) => {
         event.version || 0,
         prepareStringValue(event.namespace),
         prepareObjectValue(event.body),
-        quoteString(new Date().toISOString()),
+        event.createdUtc ? quoteString(event.createdUtc) : quoteString(new Date().toISOString()),
     ];
     return `(${values.join(',')})`;
 };
