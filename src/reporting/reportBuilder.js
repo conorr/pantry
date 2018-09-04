@@ -1,6 +1,8 @@
 const initializeReport = cacheKey => (
     {
         cacheKey,
+        // reminder: first event will have a sequenceId of 1, due to sqlite's
+        // autoincrement handling. https://sqlite.org/autoinc.html
         lastSequenceId: 0,
         body: {},
     }
