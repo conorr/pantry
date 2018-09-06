@@ -23,6 +23,8 @@ const prepareObjectValue = obj => (isDefinedObject(obj) ? quoteString(JSON.strin
 const buildInsertRow = (event) => {
     const values = [
         prepareStringValue(event.type),
+        prepareStringValue(event.entityType),
+        prepareStringValue(event.entityId),
         event.version || 0,
         prepareStringValue(event.namespace),
         prepareObjectValue(event.body),
@@ -33,13 +35,13 @@ const buildInsertRow = (event) => {
 
 const buildSaveEventQuery = (event) => {
     const row = buildInsertRow(event);
-    const query = `INSERT INTO events (type, version, namespace, body, created_utc) VALUES ${row}`;
+    const query = `INSERT INTO events (type, entity_type, entity_id, version, namespace, body, created_utc) VALUES ${row}`;
     return query;
 };
 
 const buildSaveEventsQuery = (events) => {
     const rows = events.map(event => buildInsertRow(event));
-    const query = `INSERT INTO events (type, version, namespace, body, created_utc) VALUES ${rows.join(',')}`;
+    const query = `INSERT INTO events (type, entity_type, entity_id, version, namespace, body, created_utc) VALUES ${rows.join(',')}`;
     return query;
 };
 

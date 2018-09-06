@@ -40,7 +40,9 @@ describe('Event store', () => {
     describe('end to end', () => {
         it('saves and retrieves one event', (done) => {
             eventStore.saveEvent({
-                type: 'HELLO_WORLD',
+                type: 'ADD_BANANA',
+                entityType: 'ShoppingCart',
+                entityId: '123456',
                 version: 1,
                 namespace: '',
                 body: { foo: 'bar' },
@@ -51,7 +53,9 @@ describe('Event store', () => {
 
                     const event = events[0];
                     event.sequenceId.should.equal(1);
-                    event.type.should.equal('HELLO_WORLD');
+                    event.type.should.equal('ADD_BANANA');
+                    event.entityType.should.equal('ShoppingCart');
+                    event.entityId.should.equal('123456');
                     event.version.should.equal(1);
                     event.namespace.should.equal('');
                     event.body.should.deep.equal({ foo: 'bar' });

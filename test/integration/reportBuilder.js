@@ -4,11 +4,27 @@ const { Database } = require('sqlite3');
 const EventStore = require('../../src/stores/eventStore/eventStore');
 const ReportBuilder = require('../../src/reporting/reportBuilder');
 const ReportCache = require('../../src/stores/reportCache/reportCache');
+const createEventsTableSql = require('../../src/stores/eventStore/createTableSql');
+const createReportCacheTableSql = require('../../src/stores/reportCache/createTableSql');
 
 /* eslint-disable no-undef, no-unused-expressions */
 
 chai.use(chaiAsPromised);
 chai.should();
+
+const createEventsTable = db => new Promise((resolve, reject) => {
+    db.run(createEventsTableSql, (err) => {
+        if (err) reject(err);
+        resolve();
+    });
+});
+
+const createReportCacheTable = db => new Promise((resolve, reject) => {
+    db.run(createReportCacheTableSql, (err) => {
+        if (err) reject(err);
+        resolve();
+    });
+});
 
 const truncateTables = db => new Promise((resolve, reject) => {
     db.run('DELETE FROM \'events\';', (err1) => {
@@ -26,11 +42,15 @@ describe('reportBuilder', () => {
     let reportCache;
     let reportBuilder;
 
-    before(() => {
-        db = new Database('pantry.db');
+    before((done) => {
+        db = new Database(':memory:');
         eventStore = new EventStore(db);
         reportCache = new ReportCache(db);
         reportBuilder = new ReportBuilder(eventStore, reportCache);
+        createEventsTable(db)
+            .then(() => createReportCacheTable(db))
+            .then(done)
+            .catch(err => done(err));
     });
 
     beforeEach((done) => {
