@@ -3,7 +3,7 @@ const chaiAsPromised = require('chai-as-promised');
 const { Database } = require('sqlite3');
 const EventStore = require('../../src/stores/eventStore/');
 const ReportBuilder = require('../../src/reporting/reportBuilder');
-const ReportCache = require('../../src/stores/reportCache/reportCache');
+const ReportCache = require('../../src/stores/reportCache');
 const createEventsTableSql = require('../../src/stores/eventStore/createTableSql');
 const createReportCacheTableSql = require('../../src/stores/reportCache/createTableSql');
 
