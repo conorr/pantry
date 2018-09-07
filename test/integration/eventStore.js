@@ -134,7 +134,7 @@ describe('Event store', () => {
                 { type: 'AUGMENT_ORANGE', version: 1, namespace: '', body: {} },
                 { type: 'REMOVE_ORANGE', version: 1, namespace: '', body: {} },
             ])
-                .then(() => eventStore.getEvents(3, 3))
+                .then(() => eventStore.getEvents({ sequenceIdStart: 3, top: 3 }))
                 .then((events) => {
                     events.should.have.lengthOf(3);
 

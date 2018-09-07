@@ -9,7 +9,7 @@ class ReportBuilder {
             .then((cachedReport) => {
                 const report = cachedReport ||
                     ReportBuilder.initializeReport(cacheKey);
-                return this.eventStore.getEvents(report.lastSequenceId + 1)
+                return this.eventStore.getEvents({ sequenceIdStart: report.lastSequenceId + 1 })
                     .then(events => ({ report, events }));
             })
             .then(({ report, events }) => {

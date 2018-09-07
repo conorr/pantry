@@ -1,14 +1,3 @@
-const buildSelectEventQuery = (sequenceId) => {
-    const query = `SELECT * FROM events WHERE sequence_id = ${sequenceId}`;
-    return query;
-};
-
-const buildSelectEventsQuery = (sequenceIdStart, top) => {
-    const query = `SELECT * FROM events WHERE sequence_id >= ${sequenceIdStart} ORDER BY sequence_id ASC LIMIT ${top}`;
-    return query;
-};
-
-
 const isString = val => typeof val === 'string';
 
 const isDefinedObject = obj => obj && typeof obj === 'object';
@@ -18,6 +7,23 @@ const quoteString = str => `'${str}'`;
 const prepareStringValue = str => (isString(str) ? quoteString(str) : 'null');
 
 const prepareObjectValue = obj => (isDefinedObject(obj) ? quoteString(JSON.stringify(obj)) : 'null');
+
+
+const buildSelectEventQuery = (sequenceId) => {
+    const query = `SELECT * FROM events WHERE sequence_id = ${sequenceId}`;
+    return query;
+};
+
+const buildSelectEventsQuery = (request) => {
+    const conditions = [`sequence_id >= ${request.sequenceIdStart}`];
+    if (request.eventType) conditions.push(`event_type = '${request.eventType}'`);
+    if (request.eventId) conditions.push(`event_id = '${request.eventId}'`);
+    if (request.type) conditions.push(`type = '${request.type}'`);
+    if (request.namespace) conditions.push(`namespace = '${request.namespace}'`);
+    const conditionClause = conditions.join(' AND ');
+    const query = `SELECT * FROM events WHERE ${conditionClause} ORDER BY sequence_id ASC LIMIT ${request.top}`;
+    return query;
+};
 
 
 const buildInsertRow = (event) => {

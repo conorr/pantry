@@ -1,4 +1,5 @@
 const validateEvent = require('./validateEvent');
+const validateGetEventsRequest = require('./validateGetEventsRequest');
 const rowToEvent = require('./rowToEvent');
 const {
     buildSelectEventQuery,
@@ -23,10 +24,9 @@ class EventStore {
         });
     }
 
-    getEvents(sequenceIdStart = 0, top = 100) {
-        if (sequenceIdStart < 0) throw new Error('sequenceIdStart must be zero or greater');
-        if (top < 0) throw new Error('top must be zero or greater');
-        const query = buildSelectEventsQuery(sequenceIdStart, top);
+    getEvents(request = {}) {
+        const validatedRequest = validateGetEventsRequest(request);
+        const query = buildSelectEventsQuery(validatedRequest);
         return new Promise((resolve, reject) => {
             this.database.all(query, (err, rows) => {
                 if (err) reject(err);
