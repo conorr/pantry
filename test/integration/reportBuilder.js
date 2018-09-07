@@ -64,33 +64,35 @@ describe('reportBuilder', () => {
             newReportBody.count += event.body.amount;
             return newReportBody;
         };
-        reportBuilder.buildReport('fruitReport', reducer)
+        const eventsFilter = { entityType: 'shoppingCart' };
+        reportBuilder.buildReport('fruitReport', eventsFilter, reducer)
             .then((report) => {
                 report.cacheKey.should.equal('fruitReport');
                 report.lastSequenceId.should.equal(0);
                 report.body.should.eql({});
             })
             .then(() => eventStore.saveEvents([
-                { type: 'FRUIT_ADDED', body: { amount: 2 } },
-                { type: 'FRUIT_ADDED', body: { amount: 1 } },
-                { type: 'FRUIT_ADDED', body: { amount: 7 } },
+                { type: 'FRUIT_ADDED', entityType: 'shoppingCart', body: { amount: 2 } },
+                { type: 'FRUIT_ADDED', entityType: 'shoppingCart', body: { amount: 1 } },
+                { type: 'FRUIT_ADDED', entityType: 'shippingContainer', body: { amount: 1 } }, // note different entity type!
+                { type: 'FRUIT_ADDED', entityType: 'shoppingCart', body: { amount: 7 } },
             ]))
-            .then(() => reportBuilder.buildReport('fruitReport', reducer))
+            .then(() => reportBuilder.buildReport('fruitReport', eventsFilter, reducer))
             .then((report) => {
                 report.body.count.should.equal(10);
             })
             .then(() => {
                 eventStore.saveEvents([
-                    { type: 'FRUIT_ADDED', body: { amount: 2 } },
-                    { type: 'FRUIT_ADDED', body: { amount: 3 } },
-                    { type: 'FRUIT_ADDED', body: { amount: -1 } },
+                    { type: 'FRUIT_ADDED', entityType: 'shoppingCart', body: { amount: 2 } },
+                    { type: 'FRUIT_ADDED', entityType: 'shoppingCart', body: { amount: 3 } },
+                    { type: 'FRUIT_ADDED', entityType: 'shoppingCart', body: { amount: -1 } },
                 ]);
             })
-            .then(() => reportBuilder.buildReport('fruitReport', reducer))
+            .then(() => reportBuilder.buildReport('fruitReport', eventsFilter, reducer))
             .then((report) => {
                 report.body.count.should.equal(14);
             })
-            .then(() => reportBuilder.buildReport('fruitReport', reducer))
+            .then(() => reportBuilder.buildReport('fruitReport', eventsFilter, reducer))
             .then((report) => {
                 report.body.count.should.equal(14);
             })

@@ -16,8 +16,8 @@ const buildSelectEventQuery = (sequenceId) => {
 
 const buildSelectEventsQuery = (request) => {
     const conditions = [`sequence_id >= ${request.sequenceIdStart}`];
-    if (request.eventType) conditions.push(`event_type = '${request.eventType}'`);
-    if (request.eventId) conditions.push(`event_id = '${request.eventId}'`);
+    if (request.entityType) conditions.push(`entity_type = '${request.entityType}'`);
+    if (request.entityId) conditions.push(`entity_id = '${request.entityId}'`);
     if (request.type) conditions.push(`type = '${request.type}'`);
     if (request.namespace) conditions.push(`namespace = '${request.namespace}'`);
     const conditionClause = conditions.join(' AND ');

@@ -1,15 +1,22 @@
+const Joi = require('joi');
+const eventsFilterSchema = require('./eventsFilterSchema');
+
 class ReportBuilder {
     constructor(eventStore, reportCache) {
         this.eventStore = eventStore;
         this.reportCache = reportCache;
     }
 
-    buildReport(cacheKey, reportBodyReducer) {
+    buildReport(cacheKey, eventsFilter, reportBodyReducer) {
+        ReportBuilder.validateEventsFilter(eventsFilter);
         return this.reportCache.getReport(cacheKey)
             .then((cachedReport) => {
                 const report = cachedReport ||
                     ReportBuilder.initializeReport(cacheKey);
-                return this.eventStore.getEvents({ sequenceIdStart: report.lastSequenceId + 1 })
+                const getEventsRequest = Object.assign({}, eventsFilter, {
+                    sequenceIdStart: report.lastSequenceId + 1,
+                });
+                return this.eventStore.getEvents(getEventsRequest)
                     .then(events => ({ report, events }));
             })
             .then(({ report, events }) => {
@@ -22,6 +29,11 @@ class ReportBuilder {
                 return this.reportCache.saveReport(newReport)
                     .then(() => newReport);
             });
+    }
+
+    static validateEventsFilter(eventsFilter) {
+        const result = Joi.validate(eventsFilter, eventsFilterSchema);
+        if (result.error) throw new Error(`eventsFilter failed validation: ${result.error}`);
     }
 
     static initializeReport(cacheKey) {
