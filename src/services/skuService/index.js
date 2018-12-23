@@ -48,6 +48,9 @@ class SkuService {
         return this.reportBuilder.buildReport('skuReport', eventsFilter, (reportBody, event) => {
             const sku = event.body;
 
+            if (!reportBody.skus) reportBody.skus = {};
+            if (reportBody.skus[sku.sku]) throw new Error(`Tried to add sku, but it already exists: ${sku.sku}`);
+
             const remainingQuantity = sku.startingQuantity -
                 sku.consumedQuantity -
                 sku.spoiledQuantity -
@@ -56,7 +59,6 @@ class SkuService {
                 _bookValue: round(sku.unitCost * remainingQuantity),
             });
 
-            if (!reportBody.skus) reportBody.skus = {};
             reportBody.skus[sku.sku] = skuReport;
 
             if (!reportBody.totalValue) reportBody.totalValue = 0;
