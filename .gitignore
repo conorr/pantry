@@ -1,4 +1,6 @@
+test_data/
 node_modules/
 *.swp
 .DS_Store
 *.db
+.vscode/
