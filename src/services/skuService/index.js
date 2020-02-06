@@ -38,7 +38,7 @@ class SkuService {
 
     getSku(skuId) {
         return this.buildSkuReport()
-            .then(report => report.body[skuId]);
+            .then(report => (report.body.skus || {})[skuId]);
     }
 
     buildSkuReport() {
@@ -49,7 +49,6 @@ class SkuService {
             const sku = event.body;
 
             if (!reportBody.skus) reportBody.skus = {};
-            if (reportBody.skus[sku.sku]) throw new Error(`Tried to add sku, but it already exists: ${sku.sku}`);
 
             const remainingQuantity = sku.startingQuantity -
                 sku.consumedQuantity -

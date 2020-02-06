@@ -2,7 +2,7 @@ const express = require('express');
 const Joi = require('joi');
 const { Database } = require('sqlite3');
 const EventStore = require('../../stores/eventStore');
-const skuSchema = require('./skuSchema');
+const skuSchema = require('../../services/skuService/skuSchema');
 
 const router = express.Router();
 

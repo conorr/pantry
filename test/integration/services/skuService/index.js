@@ -30,7 +30,7 @@ describe('SkuService', () => {
         Promise.all(requests)
             .then(() => service.buildSkuReport())
             .then((report) => {
-                expect(Object.keys(report.body.skus).length).to.equal(32);
+                expect(Object.keys(report.body.skus).length).to.equal(24);
                 expect(report.body.totalValue).to.equal(1037.33);
                 expect(report.body.totalStartingValue).to.equal(1933.01);
                 expect(report.body.totalConsumedValue).to.equal(895.7);
@@ -40,7 +40,7 @@ describe('SkuService', () => {
             .catch(err => done(err));
     });
 
-    xdescribe('getSku', () => {
+    describe('getSku', () => {
         it('returns undefined for a sku when no events have been saved', (done) => {
             service.getSku('abcd')
                 .then((sku) => {
@@ -90,7 +90,7 @@ describe('SkuService', () => {
                 .then((skuReport) => {
                     expect(skuReport).to.exist;
                     expect(skuReport.sku).to.equal('AtlasOliveOil3L');
-                    expect(skuReport.bookValue).to.equal(90.92);
+                    expect(skuReport._bookValue).to.equal(90.92);
                 })
                 .then(done)
                 .catch(err => done(err));
