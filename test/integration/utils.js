@@ -3,9 +3,12 @@ const createReportCacheTableSql = require('../../src/stores/reportCache/createTa
 
 const setUpDatabase = db => (
     new Promise((resolve, reject) => {
-        db.run(createEventsTableSql + createReportCacheTableSql, (err) => {
-            if (err) reject(err);
-            resolve();
+        db.run(createEventsTableSql, (err1) => {
+            if (err1) reject(err1);
+            db.run(createReportCacheTableSql, (err2) => {
+                if (err2) reject(err2);
+                resolve();
+            });
         });
     })
 );
